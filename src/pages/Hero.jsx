@@ -4,33 +4,26 @@ import { Link } from "react-router-dom";
 
 export const Hero = () => {
   return (
-    <div
-      className="hero min-h-screen"
-      style={{
-        backgroundImage: `url(${pokemonBg})`,
-      }}
+    <main
+      className="hero min-h-screen bg-cover bg-center"
+      style={{ backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.25), rgba(15, 23, 42, 0.55)), url(${pokemonBg})` }}
     >
-      {/* <div className="hero-overlay"></div> */}
-      <div className="hero-content text-neutral-content text-center">
-        <div className="max-w-md">
-          {/* <h1 className="mb-5 text-5xl sm:text-6xl md:text-8xl font-bold font-pokemon text-primary text-outline-secondary">Pokémon</h1> */}
-          <img src={pokeLogo} alt="pokemon logo" />
-          <p className="mb-5 text-base md:text-lg leading-relaxed font-medium text-white/90">
-            <span className="">Embark on Your Pokémon Adventure!</span> Search and explore detailed stats,
-            types, and abilities of every Pokémon. Build your ultimate team,
-            simulate epic battles, and keep track of your journey.
+      <div className="hero-content px-4 text-center text-white">
+        <div className="max-w-xl">
+          <img src={pokeLogo} alt="Pokemon logo" className="mx-auto max-h-44 object-contain drop-shadow-2xl" />
+          <p className="mb-6 mt-4 text-base font-bold leading-relaxed text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.9)] md:text-lg">
+            Search every Pokemon, build your team, and jump into a classic turn-based battle.
           </p>
-          {/* <button className="btn btn-primary text-secondary font-bold hover:bg-yellow-300">
-            Start Your Journey
-          </button> */}
-          <button className="relative cursor-pointer hover:translate-y-0.5">
-            <span className="absolute top-0 left-0 mt-1 ml-1 h-full w-full rounded bg-blue-700"></span>
-            <Link to="/pokedex" className="fold-bold font-pokemon relative inline-block h-full w-full rounded border-2 border-blue-700 bg-yellow-400 px-3 py-1 text-base font-bold text-white transition duration-100 hover:bg-yellow-500 hover:text-secondary">
-              Start Your Journey
+          <div className="flex flex-wrap justify-center gap-3">
+            <Link to="/pokedex" className="btn btn-primary border-2 border-blue-800 text-blue-950 shadow-md">
+              Start Journey
             </Link>
-          </button>
+            <Link to="/battle" className="btn btn-outline border-white text-white hover:border-yellow-400 hover:bg-yellow-400 hover:text-blue-950">
+              Battle
+            </Link>
+          </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 };

@@ -1,355 +1,250 @@
+import { useEffect, useMemo, useState } from "react";
+import { Search, RotateCcw } from "lucide-react";
 import { Navbar } from "../components/Navbar";
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { Pagination } from "../components/Pagination";
+import { PokedexSkeleton } from "../components/PokedexSkeleton";
 import { PokemonCard } from "../components/PokemonCard";
+import {
+  fetchPokemon,
+  fetchPokemonByType,
+  fetchPokemonCount,
+  fetchPokemonPage,
+  fetchPokemonSummaries,
+  fetchPokemonTypes,
+  DEFAULT_TOTAL_COUNT,
+  PAGE_SIZE,
+} from "../api/pokeApi";
+import { formatPokemonName } from "../utils/pokemonTypes";
 
 export const Pokedex = () => {
   const [pokemonList, setPokemonList] = useState([]);
-  const [displayedPokemons, setDisplayedPokemons] = useState([]);
+  const [types, setTypes] = useState([]);
   const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [totalPages, setTotalPages] = useState(1);
-  
-  // New states for filtering and sorting
   const [selectedType, setSelectedType] = useState("");
-  const [sortBy, setSortBy] = useState("id-asc"); // Default sort by ID ascending
-  const [pokemonTypes, setPokemonTypes] = useState([]);
-  const [detailedPokemonList, setDetailedPokemonList] = useState([]);
-  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [sortBy, setSortBy] = useState("id-asc");
+  const [page, setPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(DEFAULT_TOTAL_COUNT);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // Fetch Pokémon types
+  const normalizedSearch = search.trim().toLowerCase();
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+
   useEffect(() => {
-    axios
-      .get("https://pokeapi.co/api/v2/type")
-      .then((res) => {
-        // Filter out "unknown" and "shadow" types as they're not standard
-        const standardTypes = res.data.results
-          .filter(type => !["unknown", "shadow"].includes(type.name))
-          .map(type => type.name);
-        setPokemonTypes(standardTypes);
+    let cancelled = false;
+    fetchPokemonTypes()
+      .then((data) => {
+        if (!cancelled) setTypes(data);
       })
-      .catch((error) => {
-        console.error("Error fetching Pokémon types:", error);
-      });
+      .catch((err) => console.error("Error loading Pokemon types:", err));
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  // Fetch basic Pokémon list
   useEffect(() => {
-    setLoading(true);
-    setLoadingProgress(0);
-    
-    axios
-      .get(`https://pokeapi.co/api/v2/pokemon?limit=151`) 
-      .then((res) => {
-        setPokemonList(res.data.results);
-        
-        
-        const processPokemonInBatches = async (pokemonArray) => {
-          const batchSize = 10; // Process 10 Pokémon at a time
-          const detailedData = [];
-          let completedCount = 0;
+    let cancelled = false;
+    fetchPokemonCount()
+      .then((count) => {
+        if (!cancelled) setTotalCount(count);
+      })
+      .catch((err) => console.error("Error loading Pokemon count:", err));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-          for (let i = 0; i < pokemonArray.length; i += batchSize) {
-            const batch = pokemonArray.slice(i, i + batchSize);
-            const batchPromises = batch.map(pokemon => 
-              axios.get(pokemon.url)
-                .then(response => ({
-                  id: response.data.id,
-                  name: response.data.name,
-                  url: pokemon.url,
-                  types: response.data.types.map(t => t.type.name),
-                  sprite: response.data.sprites.front_default
-                }))
-                .catch(error => {
-                  console.error(`Error fetching details for ${pokemon.name}:`, error);
-                  return {
-                    id: 9999, // High number to sort to end
-                    name: pokemon.name,
-                    url: pokemon.url,
-                    types: [],
-                    sprite: null
-                  };
-                })
-            );
+  useEffect(() => {
+    let cancelled = false;
 
-            // Wait for current batch to complete
-            const batchResults = await Promise.all(batchPromises);
-            detailedData.push(...batchResults);
-            
-            // Update progress
-            completedCount += batchResults.length;
-            setLoadingProgress(Math.floor((completedCount / pokemonArray.length) * 100));
+    async function loadPokemon() {
+      setLoading(true);
+      setError("");
+      try {
+        if (normalizedSearch || selectedType || sortBy !== "id-asc") {
+          const source = selectedType ? await fetchPokemonByType(selectedType) : await fetchPokemonSummaries();
+          const filtered = source.filter((pokemon) =>
+            pokemon.name.toLowerCase().includes(normalizedSearch)
+          );
+          const sorted = sortPokemonSummaries(filtered, sortBy);
+          const visible = sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+          const results = await Promise.all(visible.map((pokemon) => fetchPokemon(pokemon.id || pokemon.name)));
+          if (!cancelled) {
+            setPokemonList(sortPokemonDetails(results, sortBy));
+            setTotalCount(filtered.length);
           }
+          return;
+        }
 
-          return detailedData;
-        };
-
-        processPokemonInBatches(res.data.results)
-          .then(detailedData => {
-            // Sort by ID first to ensure consistent initial display
-            const sortedData = detailedData.sort((a, b) => a.id - b.id);
-            setDetailedPokemonList(sortedData);
-            setLoading(false);
-          });
-      })
-      .catch((error) => {
-        console.error("Error fetching Pokemon data:", error);
-        setLoading(false);
-      });
-  }, []);
-
-  // Apply filtering and sorting when search, type, sort or page changes
-  useEffect(() => {
-    if (detailedPokemonList.length === 0) return;
-
-    // Apply search filter
-    let filteredPokemons = detailedPokemonList.filter((pokemon) =>
-      pokemon.name.toLowerCase().includes(search.toLowerCase())
-    );
-
-    // Apply type filter if selected
-    if (selectedType) {
-      filteredPokemons = filteredPokemons.filter((pokemon) =>
-        pokemon.types.includes(selectedType)
-      );
-    }
-
-    // Apply sorting
-    const sortedPokemons = [...filteredPokemons].sort((a, b) => {
-      switch (sortBy) {
-        case "id-asc":
-          return a.id - b.id;
-        case "id-desc":
-          return b.id - a.id;
-        case "name-asc":
-          return a.name.localeCompare(b.name);
-        case "name-desc":
-          return b.name.localeCompare(a.name);
-        default:
-          return a.id - b.id;
+        const offset = (page - 1) * PAGE_SIZE;
+        const response = await fetchPokemonPage({ limit: PAGE_SIZE, offset });
+        if (!cancelled) {
+          setPokemonList(sortPokemonDetails(response.results, sortBy));
+          setTotalCount(response.count);
+        }
+      } catch (err) {
+        console.error("Error fetching Pokemon data:", err);
+        if (!cancelled) {
+          setPokemonList([]);
+          setTotalCount(0);
+          setError("Could not load Pokemon data. Check your connection and try again.");
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-    });
-
-    setTotalPages(Math.ceil(sortedPokemons.length / 12));
-
-    // If current page exceeds new total pages, reset to page 1
-    if (page > Math.ceil(sortedPokemons.length / 12) && sortedPokemons.length > 0) {
-      setPage(1);
     }
 
-    const startIndex = (page - 1) * 12;
-    const newDisplayedPokemons = sortedPokemons.slice(startIndex, startIndex + 12);
-    setDisplayedPokemons(newDisplayedPokemons);
-  }, [search, selectedType, sortBy, page, detailedPokemonList]);
+    loadPokemon();
+    return () => {
+      cancelled = true;
+    };
+  }, [normalizedSearch, page, selectedType, sortBy]);
 
-  const handlePagination = (newPage) => {
-    if (newPage > 0 && newPage <= totalPages) {
-      setPage(newPage);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+  useEffect(() => {
+    setPage(1);
+  }, [normalizedSearch, selectedType, sortBy]);
+
+  const resultRange = useMemo(() => {
+    if (!totalCount || !pokemonList.length) return "0";
+    const start = (page - 1) * PAGE_SIZE + 1;
+    const end = Math.min(start + pokemonList.length - 1, totalCount);
+    return `${start}-${end}`;
+  }, [page, pokemonList.length, totalCount]);
+
+  const handlePageChange = (nextPage) => {
+    if (nextPage < 1 || nextPage > totalPages || loading) return;
+    setPage(nextPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleReset = () => {
+  const resetFilters = () => {
     setSearch("");
     setSelectedType("");
     setSortBy("id-asc");
     setPage(1);
   };
 
-  // Function to load more Pokémon (for expanding beyond 151)
-  const handleLoadMore = () => {
-    // This would be implemented if needed to load beyond the first generation
-  };
-
   return (
-    <>
+    <div className="min-h-screen bg-base-100">
       <Navbar />
-      <div className="p-4 flex flex-col items-center">
-        <h1 className="text-3xl font-bold mt-6 mb-4 text-center">Pokédex</h1>
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <section className="game-panel-blue mb-6 p-4 sm:p-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-sm font-black uppercase tracking-wide text-blue-800">Professor Oak's index</p>
+              <h1 className="pokemon-title text-4xl text-yellow-300 sm:text-5xl">Pokedex</h1>
+              <p className="mt-2 max-w-2xl text-sm font-semibold text-slate-800">
+                Browse every Pokemon from PokeAPI with cached page loading, type filters, and quick detail cards.
+              </p>
+            </div>
+            <div className="stats stats-horizontal overflow-hidden border-2 border-blue-900 bg-white shadow">
+              <div className="stat px-4 py-3 text-slate-900">
+                <div className="stat-title text-xs font-black text-slate-600">Showing</div>
+                <div className="stat-value text-lg text-blue-900">{resultRange}</div>
+              </div>
+              <div className="stat px-4 py-3 text-slate-900">
+                <div className="stat-title text-xs font-black text-slate-600">Total</div>
+                <div className="stat-value text-lg text-blue-900">{totalCount}</div>
+              </div>
+            </div>
+          </div>
 
-        {/* Search and Filters Section */}
-        <div className="w-full max-w-4xl mb-6 flex flex-col gap-4">
-          {/* Search Bar */}
-          <label className="input border-4 border-base-200 w-full bg-base-200">
-            <svg
-              className="h-[1em] opacity-50"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
+          <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_180px_190px_auto]">
+            <label className="input input-bordered flex items-center gap-2 border-2 border-blue-900 bg-white">
+              <Search className="size-4 text-blue-900" />
+              <input
+                type="search"
+                className="grow"
+                placeholder="Search Pokemon name"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+              />
+            </label>
+
+            <select
+              className="select select-bordered border-2 border-blue-900 bg-white capitalize"
+              value={selectedType}
+              onChange={(event) => setSelectedType(event.target.value)}
+              disabled={loading}
             >
-              <g
-                strokeLinejoin="round"
-                strokeLinecap="round"
-                strokeWidth="2.5"
-                fill="none"
-                stroke="currentColor"
-              >
-                <circle cx="11" cy="11" r="8"></circle>
-                <path d="m21 21-4.3-4.3"></path>
-              </g>
-            </svg>
-            <input
-              type="text"
-              placeholder="Search Pokémon"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full"
-            />
-          </label>
+              <option value="">All types</option>
+              {types.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
 
-          {/* Filters Row */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Type Filter */}
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-medium">Filter by Type</span>
-              </label>
-              <select
-                className="select select-bordered w-full"
-                value={selectedType}
-                onChange={(e) => setSelectedType(e.target.value)}
-                disabled={loading}
-              >
-                <option value="">All Types</option>
-                {pokemonTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type.charAt(0).toUpperCase() + type.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <select
+              className="select select-bordered border-2 border-blue-900 bg-white"
+              value={sortBy}
+              onChange={(event) => setSortBy(event.target.value)}
+              disabled={loading}
+            >
+              <option value="id-asc">Number: low to high</option>
+              <option value="id-desc">Number: high to low</option>
+              <option value="name-asc">Name: A-Z</option>
+              <option value="name-desc">Name: Z-A</option>
+            </select>
 
-            {/* Sort By */}
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-medium">Sort By</span>
-              </label>
-              <select
-                className="select select-bordered w-full"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                disabled={loading}
-              >
-                <option value="id-asc">Number (Low to High)</option>
-                <option value="id-desc">Number (High to Low)</option>
-                <option value="name-asc">Name (A-Z)</option>
-                <option value="name-desc">Name (Z-A)</option>
-              </select>
-            </div>
-
-            {/* Reset Button */}
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-medium">Reset Filters</span>
-              </label>
-              <button
-                onClick={handleReset}
-                className="btn bg-red-500 hover:bg-red-600 block text-white border-none"
-                disabled={loading}
-              >
-                Reset All Filters
-              </button>
-            </div>
+            <button className="btn btn-outline" onClick={resetFilters} disabled={loading && !search && !selectedType}>
+              <RotateCcw className="size-4" />
+              Reset
+            </button>
           </div>
-        </div>
+        </section>
 
-        {/* Active Filters Tags */}
-        {!loading && (
-          <div className="flex flex-wrap gap-2 mb-4 w-full max-w-4xl">
-            {search && (
-              <div className="badge badge-outline gap-1 p-3">
-                Search: {search}
-                <button onClick={() => setSearch("")} className="ml-1">
-                  ✕
-                </button>
-              </div>
-            )}
-            {selectedType && (
-              <div className="badge badge-outline gap-1 p-3">
-                Type: {selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}
-                <button onClick={() => setSelectedType("")} className="ml-1">
-                  ✕
-                </button>
-              </div>
-            )}
-            {sortBy && (
-              <div className="badge badge-outline gap-1 p-3">
-                {sortBy === "id-asc" && "Sorted by: Number (Low to High)"}
-                {sortBy === "id-desc" && "Sorted by: Number (High to Low)"}
-                {sortBy === "name-asc" && "Sorted by: Name (A-Z)"}
-                {sortBy === "name-desc" && "Sorted by: Name (Z-A)"}
-              </div>
-            )}
-          </div>
-        )}
+        {error && <div className="alert alert-error mb-5">{error}</div>}
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center h-64">
-            <div className="text-xl font-bold text-yellow-500 mb-2">
-              Loading Pokémon... {loadingProgress}%
-            </div>
-            <div className="w-64 h-4 bg-gray-200 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-yellow-500 transition-all duration-300"
-                style={{ width: `${loadingProgress}%` }}
-              ></div>
-            </div>
-            <div className="relative w-16 h-16 mt-4">
-              <div className="absolute top-0 left-0 w-full h-full rounded-full border-4 border-t-yellow-500 border-r-yellow-300 border-b-yellow-400 border-l-yellow-200 animate-spin"></div>
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full border-2 border-gray-300"></div>
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-red-500 rounded-full"></div>
-            </div>
-          </div>
-        ) : displayedPokemons.length === 0 ? (
-          <div className="text-center py-10">
-            <p className="text-xl font-medium">
-              No Pokémon found with the current filters
-            </p>
-            <button
-              onClick={handleReset}
-              className="mt-4 btn bg-yellow-400 hover:bg-yellow-500 text-black border-none"
-            >
-              Clear All Filters
+          <PokedexSkeleton />
+        ) : pokemonList.length === 0 ? (
+          <div className="game-panel p-10 text-center">
+            <h2 className="text-2xl font-bold">No Pokemon found</h2>
+            <p className="mt-2 text-base-content/70">Try a different name or clear your filters.</p>
+            <button className="btn btn-primary mt-4" onClick={resetFilters}>
+              Clear filters
             </button>
           </div>
         ) : (
           <>
-            {/* Results Summary */}
-            <div className="w-full max-w-4xl mb-4 text-sm">
-              Showing {((page - 1) * 12) + 1}-{Math.min(page * 12, (totalPages - 1) * 12 + displayedPokemons.length)} of {totalPages * 12 <= detailedPokemonList.length ? totalPages * 12 : detailedPokemonList.length} Pokémon
-            </div>
-
-            <div className="flex flex-wrap justify-center gap-6 mt-4 container">
-              {displayedPokemons.map((pokemon, index) => (
-                <PokemonCard key={`${pokemon.id}-${index}`} url={pokemon.url} />
+            <div className={`grid grid-cols-1 gap-5 transition-opacity duration-200 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ${loading ? "opacity-60" : "opacity-100"}`}>
+              {pokemonList.map((pokemon) => (
+                <PokemonCard key={pokemon.id} pokemon={pokemon} />
               ))}
             </div>
 
-            {/* Pagination Controls */}
-            <div className="join mt-6 mb-4">
-              <button
-                className="join-item btn bg-yellow-400 hover:bg-yellow-500 text-black border-none"
-                onClick={() => handlePagination(page - 1)}
-                disabled={page === 1}
-              >
-                Previous
-              </button>
-
-              <button className="join-item btn bg-gray-200 text-black pointer-events-none">
-                Page {page} of {totalPages}
-              </button>
-
-              <button
-                className="join-item btn bg-yellow-400 hover:bg-yellow-500 text-black border-none"
-                onClick={() => handlePagination(page + 1)}
-                disabled={page >= totalPages}
-              >
-                Next
-              </button>
-            </div>
+            {!normalizedSearch && (
+              <div className="game-panel mt-8 p-4">
+                <Pagination
+                  page={page}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                  disabled={loading}
+                />
+              </div>
+            )}
           </>
         )}
-      </div>
-    </>
+      </main>
+    </div>
   );
 };
+
+function sortPokemonSummaries(list, sortBy) {
+  return [...list].sort((a, b) => {
+    if (sortBy === "id-desc") return b.id - a.id;
+    if (sortBy === "name-asc") return a.name.localeCompare(b.name);
+    if (sortBy === "name-desc") return b.name.localeCompare(a.name);
+    return a.id - b.id;
+  });
+}
+
+function sortPokemonDetails(list, sortBy) {
+  return [...list].sort((a, b) => {
+    if (sortBy === "id-desc") return b.id - a.id;
+    if (sortBy === "name-asc") return formatPokemonName(a.name).localeCompare(formatPokemonName(b.name));
+    if (sortBy === "name-desc") return formatPokemonName(b.name).localeCompare(formatPokemonName(a.name));
+    return a.id - b.id;
+  });
+}

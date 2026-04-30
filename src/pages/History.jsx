@@ -1,7 +1,7 @@
 import { Navbar } from "../components/Navbar";
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
 import dayjs from "dayjs";
+import { deleteBattle, fetchBattles } from "../api/localApi";
 
 export const History = () => {
   const [battles, setBattles] = useState([]);
@@ -10,8 +10,8 @@ export const History = () => {
 
   const fetchBattleHistory = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/battles");
-      const sortedBattles = response.data.sort(
+      const response = await fetchBattles();
+      const sortedBattles = response.sort(
         (a, b) => new Date(b.date) - new Date(a.date)
       );
       setBattles(sortedBattles);
@@ -22,7 +22,7 @@ export const History = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:3001/battles/${id}`);
+      await deleteBattle(id);
       setBattles((prev) => prev.filter((b) => b.id !== id));
       setSelectedBattle(null);
       // Show toast
@@ -52,7 +52,8 @@ export const History = () => {
     if (!battle) return "Unknown";
 
     if (battle.battleType) {
-      // return battle.battleType;
+      if (battle.battleType === "classic") return "Classic Battle";
+      if (battle.battleType === "stats") return "Stats Battle";
       return "Damage Based Battle";
     }
 
@@ -88,27 +89,30 @@ export const History = () => {
 
   // Display appropriate result class for styling
   const getResultClass = (result) => {
-    if (result.includes("You Win!")) return "text-primary font-semibold";
-    if (result.includes("You Lose!")) return "text-error font-semibold";
-    return "text-warning font-semibold";
+    if (result.includes("You Win!")) return "text-green-700 font-black";
+    if (result.includes("You Lose!")) return "text-red-700 font-black";
+    return "text-amber-700 font-black";
   };
 
   return (
     <div className="min-h-screen bg-base-100">
       <Navbar />
       <div className="container mx-auto p-4">
-        <h2 className="text-3xl font-bold my-6 text-center">Battle History</h2>
+        <section className="game-panel-blue my-6 p-5 text-center">
+          <p className="text-sm font-black uppercase text-blue-800">Trainer records</p>
+          <h2 className="pokemon-title text-4xl text-yellow-300 sm:text-5xl">Battle History</h2>
+        </section>
 
         {/* Stats Summary Card */}
-        <div className="stats shadow w-full mb-8 bg-base-200">
+        <div className="stats mb-8 w-full overflow-hidden border-4 border-slate-900 bg-white text-slate-950 shadow-[0_4px_0_#94a3b8]">
           <div className="stat">
-            <div className="stat-title">Total Matches</div>
-            <div className="stat-value text-base-content">{totalMatches}</div>
+            <div className="stat-title font-black text-slate-600">Total Matches</div>
+            <div className="stat-value text-blue-950">{totalMatches}</div>
           </div>
 
           <div className="stat">
-            <div className="stat-title">Wins</div>
-            <div className="stat-value text-primary">{totalWins}</div>
+            <div className="stat-title font-black text-slate-600">Wins</div>
+            <div className="stat-value text-green-700">{totalWins}</div>
             <div className="stat-desc">
               {totalMatches > 0
                 ? `${Math.round((totalWins / totalMatches) * 100)}%`
@@ -117,8 +121,8 @@ export const History = () => {
           </div>
 
           <div className="stat">
-            <div className="stat-title">Losses</div>
-            <div className="stat-value text-error">{totalLosses}</div>
+            <div className="stat-title font-black text-slate-600">Losses</div>
+            <div className="stat-value text-red-700">{totalLosses}</div>
             <div className="stat-desc">
               {totalMatches > 0
                 ? `${Math.round((totalLosses / totalMatches) * 100)}%`
@@ -127,8 +131,8 @@ export const History = () => {
           </div>
 
           <div className="stat">
-            <div className="stat-title">Draws</div>
-            <div className="stat-value text-warning">{totalDraws}</div>
+            <div className="stat-title font-black text-slate-600">Draws</div>
+            <div className="stat-value text-amber-700">{totalDraws}</div>
             <div className="stat-desc">
               {totalMatches > 0
                 ? `${Math.round((totalDraws / totalMatches) * 100)}%`
@@ -206,7 +210,7 @@ export const History = () => {
             {filteredBattles.map((battle) => (
               <div
                 key={battle.id}
-                className="card bg-base-200 shadow-md hover:shadow-lg transition-shadow duration-200"
+                className="card border-4 border-slate-900 bg-white text-slate-950 shadow-[0_4px_0_#94a3b8] transition duration-200 hover:-translate-y-1 hover:shadow-[0_8px_0_#64748b]"
               >
                 <div className="card-body p-4">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -214,7 +218,7 @@ export const History = () => {
                       <h3 className="card-title text-lg">
                         {battle.pokemon1} vs {battle.pokemon2}
                       </h3>
-                      <div className="badge badge-outline mt-1">
+                      <div className="badge badge-outline mt-1 border-slate-900 font-black text-blue-950">
                         {getBattleMode(battle)}
                       </div>
                     </div>
@@ -223,7 +227,7 @@ export const History = () => {
                       <div className={getResultClass(battle.result)}>
                         {battle.result}
                       </div>
-                      <div className="text-sm text-base-content/70">
+                      <div className="text-sm font-semibold text-slate-600">
                         {dayjs(battle.date).format("MMM D, YYYY h:mm A")}
                       </div>
                     </div>

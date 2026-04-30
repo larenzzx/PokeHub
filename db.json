@@ -92,6 +92,99 @@
           "base": 45
         }
       ]
+    },
+    {
+      "id": "9ed6",
+      "name": "charmander",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png",
+      "stats": [
+        {
+          "name": "hp",
+          "base": 39
+        },
+        {
+          "name": "attack",
+          "base": 52
+        },
+        {
+          "name": "defense",
+          "base": 43
+        },
+        {
+          "name": "special-attack",
+          "base": 60
+        },
+        {
+          "name": "special-defense",
+          "base": 50
+        },
+        {
+          "name": "speed",
+          "base": 65
+        }
+      ]
+    },
+    {
+      "id": "9ba0",
+      "name": "scovillain-mega",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/10320.png",
+      "stats": [
+        {
+          "name": "hp",
+          "base": 65
+        },
+        {
+          "name": "attack",
+          "base": 138
+        },
+        {
+          "name": "defense",
+          "base": 85
+        },
+        {
+          "name": "special-attack",
+          "base": 138
+        },
+        {
+          "name": "special-defense",
+          "base": 85
+        },
+        {
+          "name": "speed",
+          "base": 75
+        }
+      ]
+    },
+    {
+      "id": "2cc2",
+      "name": "venusaur",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/3.png",
+      "stats": [
+        {
+          "name": "hp",
+          "base": 80
+        },
+        {
+          "name": "attack",
+          "base": 82
+        },
+        {
+          "name": "defense",
+          "base": 83
+        },
+        {
+          "name": "special-attack",
+          "base": 100
+        },
+        {
+          "name": "special-defense",
+          "base": 100
+        },
+        {
+          "name": "speed",
+          "base": 80
+        }
+      ]
     }
   ],
   "battles": [
@@ -320,6 +413,46 @@
       "result": "mewtwo, You Win!",
       "date": "2025-04-30T02:56:52.542Z",
       "battleType": "damage"
+    },
+    {
+      "id": "d1df",
+      "pokemon1": "ivysaur",
+      "pokemon2": "charmander",
+      "result": "Ivysaur, You Win!",
+      "date": "2026-04-30T22:04:01.916Z",
+      "battleType": "classic"
+    },
+    {
+      "id": "84c4",
+      "pokemon1": "charmander",
+      "pokemon2": "machoke",
+      "result": "Machoke, You Lose!",
+      "date": "2026-04-30T22:08:16.259Z",
+      "battleType": "classic"
+    },
+    {
+      "id": "1622",
+      "pokemon1": "mewtwo",
+      "pokemon2": "steenee",
+      "result": "Mewtwo, You Win!",
+      "date": "2026-04-30T22:10:45.684Z",
+      "battleType": "stats"
+    },
+    {
+      "id": "063b",
+      "pokemon1": "charmander",
+      "pokemon2": "pikachu-pop-star",
+      "result": "Pikachu Pop Star, You Lose!",
+      "date": "2026-04-30T22:14:35.579Z",
+      "battleType": "classic"
+    },
+    {
+      "id": "eeea",
+      "pokemon1": "bulbasaur",
+      "pokemon2": "ledian",
+      "result": "Ledian, You Lose!",
+      "date": "2026-04-30T22:14:49.319Z",
+      "battleType": "stats"
     }
   ]
 }
