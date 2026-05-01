@@ -1,5 +1,6 @@
 @import url("https://fonts.cdnfonts.com/css/pokemon-solid");
-@import url("https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Fredoka+One&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
 @import "tailwindcss";
 @plugin "daisyui";
 
@@ -7,10 +8,318 @@
   --font-pokemon-logo: "Pokemon Solid", sans-serif;
   --font-pokemon-s: "Fredoka One", "cursive";
   --font-pokemon: "Fredoka", sans-serif;
+  --font-arcade: "Press Start 2P", system-ui;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  min-width: 0;
+}
+
+img,
+svg,
+canvas,
+video {
+  max-width: 100%;
 }
 
 body {
-  @apply font-pokemon-s bg-base-100;
+  @apply bg-base-100 font-pokemon text-base-content;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 16px 16px, rgba(37, 99, 235, 0.08) 0 5px, transparent 6px),
+    linear-gradient(180deg, #f8fbff 0%, #e8f3ff 44%, #fff8d7 100%);
+  background-size: 48px 48px, auto;
+}
+
+h1,
+h2,
+h3,
+.font-black,
+.font-bold {
+  letter-spacing: 0;
+}
+
+.pokemon-title {
+  font-family: var(--font-pokemon-logo);
+  letter-spacing: 0;
+  -webkit-text-stroke: 2px #2563eb;
+  text-shadow:
+    2px 2px 0 #1d4ed8,
+    4px 4px 0 rgba(15, 23, 42, 0.18);
+}
+
+.arcade-title {
+  font-family: var(--font-arcade);
+  letter-spacing: 0;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  text-shadow:
+    3px 3px 0 #1d4ed8,
+    6px 6px 0 rgba(0, 0, 0, 0.45);
+}
+
+.arcade-panel {
+  border: 4px solid #facc15;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(37, 99, 235, 0.96), rgba(15, 23, 42, 0.98)),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.08) 0 2px, transparent 2px 5px);
+  box-shadow:
+    0 5px 0 #ca8a04,
+    0 14px 34px rgba(0, 0, 0, 0.32);
+}
+
+.image-render-pixel {
+  image-rendering: pixelated;
+}
+
+.game-panel {
+  border: 4px solid #1f2937;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow:
+    0 4px 0 #94a3b8,
+    0 12px 28px rgba(15, 23, 42, 0.14);
+}
+
+.game-panel-blue {
+  border: 4px solid #1e3a8a;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #dbeafe 0%, #ffffff 55%, #fef3c7 100%);
+  box-shadow:
+    0 4px 0 #1d4ed8,
+    0 12px 28px rgba(15, 23, 42, 0.14);
+}
+
+.btn {
+  font-weight: 800;
+  letter-spacing: 0;
+  white-space: normal;
+  text-wrap: balance;
+}
+
+.btn-primary {
+  color: #172554;
+  border-color: #1d4ed8;
+  box-shadow: 0 3px 0 #1d4ed8;
+}
+
+.btn-secondary,
+.btn-accent {
+  color: #ffffff;
+}
+
+.input,
+.select,
+.textarea {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.tab {
+  color: #1e3a8a;
+  font-weight: 900;
+}
+
+.tab:checked {
+  color: #0f172a;
+}
+
+.pokemon-sprite {
+  max-width: min(13rem, 42vw);
+  transition:
+    transform 220ms ease,
+    opacity 300ms ease,
+    filter 220ms ease;
+}
+
+.pokemon-sprite.is-attacking {
+  animation: pokemon-attack 360ms ease;
+}
+
+.pokemon-sprite.is-hit {
+  animation: pokemon-hit 420ms ease;
+  filter: brightness(1.5) saturate(1.4);
+}
+
+.pokemon-sprite.is-fainted {
+  transform: translateY(26px) rotate(-8deg) !important;
+  opacity: 0.35;
+  filter: grayscale(1);
+}
+
+.hp-low {
+  animation: hp-pulse 900ms ease-in-out infinite;
+}
+
+.battlefield {
+  background:
+    radial-gradient(ellipse at 24% 72%, rgba(255, 255, 255, 0.9) 0 12%, rgba(187, 247, 208, 0.8) 13% 22%, transparent 23%),
+    radial-gradient(ellipse at 76% 42%, rgba(255, 255, 255, 0.9) 0 10%, rgba(187, 247, 208, 0.8) 11% 20%, transparent 21%),
+    linear-gradient(180deg, #9bdcff 0 36%, #d7f8d0 37% 58%, #76c85b 59% 100%);
+}
+
+.battlefield::before {
+  content: "";
+  position: absolute;
+  inset: 36% 0 auto;
+  height: 15%;
+  background:
+    linear-gradient(90deg, transparent, rgba(22, 101, 52, 0.18), transparent),
+    repeating-linear-gradient(90deg, rgba(22, 101, 52, 0.18) 0 10px, transparent 10px 22px);
+  opacity: 0.5;
+}
+
+.damage-pop {
+  position: absolute;
+  top: 44%;
+  left: 50%;
+  z-index: 5;
+  transform: translate(-50%, -50%);
+  font-size: 1.8rem;
+  font-weight: 900;
+  text-shadow: 2px 2px 0 #111827;
+  animation: damage-rise 760ms ease-out forwards;
+  pointer-events: none;
+}
+
+.skill-effect {
+  position: absolute;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 9999px;
+  opacity: 0;
+  pointer-events: none;
+  animation: skill-pop 420ms ease;
+  filter: saturate(1.4);
+}
+
+.battle-intro {
+  animation: battle-flash 1.7s ease forwards;
+}
+
+.pokeball-pulse {
+  position: relative;
+  width: 6rem;
+  height: 6rem;
+  overflow: hidden;
+  border: 6px solid #111827;
+  border-radius: 9999px;
+  background: linear-gradient(#ef4444 0 48%, #111827 48% 54%, #ffffff 54% 100%);
+  animation: pokeball-spin 900ms ease-in-out infinite;
+}
+
+.pokeball-pulse::after {
+  content: "";
+  position: absolute;
+  inset: 50%;
+  width: 1.9rem;
+  height: 1.9rem;
+  border: 5px solid #111827;
+  border-radius: 9999px;
+  background: #ffffff;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes pokemon-attack {
+  0% {
+    transform: translateX(0) scale(1);
+  }
+  45% {
+    transform: translateX(var(--attack-distance, 24px)) scale(1.08);
+  }
+  100% {
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes pokemon-hit {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-8px);
+  }
+  40% {
+    transform: translateX(8px);
+  }
+  60% {
+    transform: translateX(-5px);
+  }
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes skill-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  40% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.45);
+  }
+}
+
+@keyframes battle-flash {
+  0% {
+    clip-path: inset(0 50% 0 50%);
+    filter: brightness(2);
+  }
+  20% {
+    clip-path: inset(0 0 0 0);
+  }
+  72% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes pokeball-spin {
+  0%,
+  100% {
+    transform: rotate(-10deg) scale(1);
+  }
+  50% {
+    transform: rotate(14deg) scale(1.08);
+  }
+}
+
+@keyframes hp-pulse {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.28);
+  }
+}
+
+@keyframes damage-rise {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 8px) scale(0.85);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -44px) scale(1.25);
+  }
 }
 
 
@@ -21,29 +330,29 @@ body {
   default: false;
   prefersdark: false;
   color-scheme: "light";
-  --color-base-100: oklch(98% 0 0);
-  --color-base-200: oklch(96% 0.001 286.375);
-  --color-base-300: oklch(92% 0.004 286.32);
-  --color-base-content: oklch(21% 0.006 285.885);
-  --color-primary: oklch(0.83 0.2 90);
-  --color-primary-content: oklch(98% 0.022 95.277);
-  --color-secondary: oklch(0.5 0.15 250);
-  --color-secondary-content: oklch(98% 0.022 95.277);
-  --color-accent: oklch(68% 0.162 75.834);
-  --color-accent-content: oklch(98% 0.026 102.212);
-  --color-neutral: oklch(21% 0.006 285.885);
-  --color-neutral-content: oklch(98% 0 0);
-  --color-info: oklch(60% 0.126 221.723);
-  --color-info-content: oklch(98% 0.019 200.873);
-  --color-success: oklch(59% 0.145 163.225);
-  --color-success-content: oklch(97% 0.021 166.113);
-  --color-warning: oklch(64% 0.222 41.116);
-  --color-warning-content: oklch(98% 0.016 73.684);
-  --color-error: oklch(57% 0.245 27.325);
-  --color-error-content: oklch(97% 0.013 17.38);
+  --color-base-100: oklch(98% 0.018 96);
+  --color-base-200: oklch(94% 0.035 93);
+  --color-base-300: oklch(86% 0.045 91);
+  --color-base-content: oklch(22% 0.055 257);
+  --color-primary: oklch(84% 0.19 88);
+  --color-primary-content: oklch(22% 0.055 257);
+  --color-secondary: oklch(48% 0.21 264);
+  --color-secondary-content: oklch(98% 0.018 96);
+  --color-accent: oklch(58% 0.23 29);
+  --color-accent-content: oklch(98% 0.018 96);
+  --color-neutral: oklch(24% 0.065 257);
+  --color-neutral-content: oklch(98% 0.018 96);
+  --color-info: oklch(58% 0.18 240);
+  --color-info-content: oklch(98% 0.018 96);
+  --color-success: oklch(53% 0.16 148);
+  --color-success-content: oklch(98% 0.018 96);
+  --color-warning: oklch(72% 0.19 72);
+  --color-warning-content: oklch(20% 0.055 257);
+  --color-error: oklch(55% 0.22 28);
+  --color-error-content: oklch(98% 0.018 96);
   --radius-selector: 0.25rem;
   --radius-field: 2rem;
-  --radius-box: 1rem;
+  --radius-box: 0.625rem;
   --size-selector: 0.25rem;
   --size-field: 0.25rem;
   --border: 1.5px;

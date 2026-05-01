@@ -1,17 +1,20 @@
 import { Navbar } from "../components/Navbar";
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
 import dayjs from "dayjs";
+import { deleteBattle, fetchBattles } from "../api/localApi";
+import { Link } from "react-router-dom";
+import { RotateCcw, Trash2 } from "lucide-react";
 
 export const History = () => {
   const [battles, setBattles] = useState([]);
   const [selectedBattle, setSelectedBattle] = useState(null); // For delete modal
   const [filterType, setFilterType] = useState("all"); // Filter options: all, wins, losses, draws
+  const [toast, setToast] = useState("");
 
   const fetchBattleHistory = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/battles");
-      const sortedBattles = response.data.sort(
+      const response = await fetchBattles();
+      const sortedBattles = [...response].sort(
         (a, b) => new Date(b.date) - new Date(a.date)
       );
       setBattles(sortedBattles);
@@ -22,21 +25,25 @@ export const History = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:3001/battles/${id}`);
+      await deleteBattle(id);
       setBattles((prev) => prev.filter((b) => b.id !== id));
       setSelectedBattle(null);
-      // Show toast
-      const toast = document.getElementById("toast-delete");
-      if (toast) toast.classList.remove("hidden");
-      setTimeout(() => toast?.classList.add("hidden"), 3000);
+      setToast("Battle record deleted.");
     } catch (error) {
       console.error("Error deleting battle:", error);
+      setToast("Could not delete battle. It was removed locally if the server is offline.");
     }
   };
 
   useEffect(() => {
     fetchBattleHistory();
   }, []);
+
+  useEffect(() => {
+    if (!toast) return undefined;
+    const timer = window.setTimeout(() => setToast(""), 2800);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
 
   const totalWins = battles.filter((b) => b.result.includes("You Win!")).length;
   const totalLosses = battles.filter((b) =>
@@ -52,7 +59,8 @@ export const History = () => {
     if (!battle) return "Unknown";
 
     if (battle.battleType) {
-      // return battle.battleType;
+      if (battle.battleType === "classic") return "Classic Battle";
+      if (battle.battleType === "stats") return "Stats Battle";
       return "Damage Based Battle";
     }
 
@@ -88,27 +96,35 @@ export const History = () => {
 
   // Display appropriate result class for styling
   const getResultClass = (result) => {
-    if (result.includes("You Win!")) return "text-primary font-semibold";
-    if (result.includes("You Lose!")) return "text-error font-semibold";
-    return "text-warning font-semibold";
+    if (result.includes("You Win!")) return "text-green-700 font-black";
+    if (result.includes("You Lose!")) return "text-red-700 font-black";
+    return "text-amber-700 font-black";
   };
 
   return (
     <div className="min-h-screen bg-base-100">
       <Navbar />
       <div className="container mx-auto p-4">
-        <h2 className="text-3xl font-bold my-6 text-center">Battle History</h2>
+        <section className="game-panel-blue my-6 p-5 text-center">
+          <p className="text-sm font-black uppercase text-blue-800">Trainer records</p>
+          <h2 className="pokemon-title text-4xl text-yellow-300 sm:text-5xl">Battle History</h2>
+        </section>
+        {toast && (
+          <div className="toast toast-top toast-end z-50">
+            <div className="alert alert-success shadow-lg"><span>{toast}</span></div>
+          </div>
+        )}
 
         {/* Stats Summary Card */}
-        <div className="stats shadow w-full mb-8 bg-base-200">
+        <div className="stats mb-8 w-full overflow-hidden border-4 border-slate-900 bg-white text-slate-950 shadow-[0_4px_0_#94a3b8]">
           <div className="stat">
-            <div className="stat-title">Total Matches</div>
-            <div className="stat-value text-base-content">{totalMatches}</div>
+            <div className="stat-title font-black text-slate-600">Total Matches</div>
+            <div className="stat-value text-blue-950">{totalMatches}</div>
           </div>
 
           <div className="stat">
-            <div className="stat-title">Wins</div>
-            <div className="stat-value text-primary">{totalWins}</div>
+            <div className="stat-title font-black text-slate-600">Wins</div>
+            <div className="stat-value text-green-700">{totalWins}</div>
             <div className="stat-desc">
               {totalMatches > 0
                 ? `${Math.round((totalWins / totalMatches) * 100)}%`
@@ -117,8 +133,8 @@ export const History = () => {
           </div>
 
           <div className="stat">
-            <div className="stat-title">Losses</div>
-            <div className="stat-value text-error">{totalLosses}</div>
+            <div className="stat-title font-black text-slate-600">Losses</div>
+            <div className="stat-value text-red-700">{totalLosses}</div>
             <div className="stat-desc">
               {totalMatches > 0
                 ? `${Math.round((totalLosses / totalMatches) * 100)}%`
@@ -127,8 +143,8 @@ export const History = () => {
           </div>
 
           <div className="stat">
-            <div className="stat-title">Draws</div>
-            <div className="stat-value text-warning">{totalDraws}</div>
+            <div className="stat-title font-black text-slate-600">Draws</div>
+            <div className="stat-value text-amber-700">{totalDraws}</div>
             <div className="stat-desc">
               {totalMatches > 0
                 ? `${Math.round((totalDraws / totalMatches) * 100)}%`
@@ -163,26 +179,17 @@ export const History = () => {
           >
             Draws
           </button>
+          <button className="btn btn-outline" onClick={() => setFilterType("all")}>
+            <RotateCcw className="size-4" />
+            Clear filters
+          </button>
         </div>
 
         {battles.length === 0 ? (
-          <div className="alert alert-info">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              className="stroke-current shrink-0 w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              ></path>
-            </svg>
-            <span>
-              No battles recorded yet. Start battling to see your history!
-            </span>
+          <div className="game-panel mx-auto max-w-lg p-8 text-center">
+            <h2 className="text-2xl font-black text-blue-950">No battles recorded yet</h2>
+            <p className="mt-2 font-semibold text-slate-700">Start a classic battle to build your trainer record.</p>
+            <Link to="/battle" className="btn btn-primary mt-5">Start battle</Link>
           </div>
         ) : filteredBattles.length === 0 ? (
           <div className="alert alert-info">
@@ -206,7 +213,7 @@ export const History = () => {
             {filteredBattles.map((battle) => (
               <div
                 key={battle.id}
-                className="card bg-base-200 shadow-md hover:shadow-lg transition-shadow duration-200"
+                className="card border-4 border-slate-900 bg-white text-slate-950 shadow-[0_4px_0_#94a3b8] transition duration-200 hover:-translate-y-1 hover:shadow-[0_8px_0_#64748b]"
               >
                 <div className="card-body p-4">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -214,7 +221,7 @@ export const History = () => {
                       <h3 className="card-title text-lg">
                         {battle.pokemon1} vs {battle.pokemon2}
                       </h3>
-                      <div className="badge badge-outline mt-1">
+                      <div className="badge badge-outline mt-1 border-slate-900 font-black text-blue-950">
                         {getBattleMode(battle)}
                       </div>
                     </div>
@@ -223,9 +230,10 @@ export const History = () => {
                       <div className={getResultClass(battle.result)}>
                         {battle.result}
                       </div>
-                      <div className="text-sm text-base-content/70">
+                      <div className="text-sm font-semibold text-slate-600">
                         {dayjs(battle.date).format("MMM D, YYYY h:mm A")}
                       </div>
+                      {battle.turns && <div className="text-xs font-bold text-slate-500">{battle.turns} turns · {battle.duration || 0}s · MVP {battle.mvpPokemon}</div>}
                     </div>
 
                     <div className="flex justify-end">
@@ -233,6 +241,7 @@ export const History = () => {
                         className="btn btn-sm btn-error"
                         onClick={() => setSelectedBattle(battle)}
                       >
+                        <Trash2 className="size-4" />
                         Delete
                       </button>
                     </div>
@@ -269,12 +278,6 @@ export const History = () => {
         </dialog>
       )}
 
-      {/* DaisyUI Toast */}
-      <div id="toast-delete" className="toast toast-top toast-end hidden z-50">
-        <div className="alert alert-success">
-          <span>Battle record deleted successfully.</span>
-        </div>
-      </div>
     </div>
   );
 };

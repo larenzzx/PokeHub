@@ -1,9 +1,105 @@
 {
   "team": [
     {
-      "id": "fb75",
-      "name": "ivysaur",
-      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/2.png",
+      "id": "1e562b4b-de0e-4bd5-becc-3f1f2158e50b",
+      "name": "charmander",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png",
+      "stats": [
+        {
+          "name": "hp",
+          "base": 39
+        },
+        {
+          "name": "attack",
+          "base": 52
+        },
+        {
+          "name": "defense",
+          "base": 43
+        },
+        {
+          "name": "special-attack",
+          "base": 60
+        },
+        {
+          "name": "special-defense",
+          "base": 50
+        },
+        {
+          "name": "speed",
+          "base": 65
+        }
+      ],
+      "order": 2
+    },
+    {
+      "id": "e6605c0f-9afe-4c99-9634-8992abadd964",
+      "name": "venusaur",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/3.png",
+      "stats": [
+        {
+          "name": "hp",
+          "base": 80
+        },
+        {
+          "name": "attack",
+          "base": 82
+        },
+        {
+          "name": "defense",
+          "base": 83
+        },
+        {
+          "name": "special-attack",
+          "base": 100
+        },
+        {
+          "name": "special-defense",
+          "base": 100
+        },
+        {
+          "name": "speed",
+          "base": 80
+        }
+      ],
+      "order": 0
+    },
+    {
+      "id": "013e2cdc-d3fb-4c6d-a490-ebdd82730852",
+      "name": "charizard",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png",
+      "stats": [
+        {
+          "name": "hp",
+          "base": 78
+        },
+        {
+          "name": "attack",
+          "base": 84
+        },
+        {
+          "name": "defense",
+          "base": 78
+        },
+        {
+          "name": "special-attack",
+          "base": 109
+        },
+        {
+          "name": "special-defense",
+          "base": 85
+        },
+        {
+          "name": "speed",
+          "base": 100
+        }
+      ],
+      "order": 1
+    },
+    {
+      "id": "bff30767-7393-457c-86e8-142af07ba994",
+      "name": "butterfree",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/12.png",
       "stats": [
         {
           "name": "hp",
@@ -11,73 +107,75 @@
         },
         {
           "name": "attack",
-          "base": 62
+          "base": 45
         },
         {
           "name": "defense",
+          "base": 50
+        },
+        {
+          "name": "special-attack",
+          "base": 90
+        },
+        {
+          "name": "special-defense",
+          "base": 80
+        },
+        {
+          "name": "speed",
+          "base": 70
+        }
+      ],
+      "order": 3
+    },
+    {
+      "id": "bd9741c7-ee63-4578-af33-09e0be2786af",
+      "name": "blastoise",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/9.png",
+      "stats": [
+        {
+          "name": "hp",
+          "base": 79
+        },
+        {
+          "name": "attack",
+          "base": 83
+        },
+        {
+          "name": "defense",
+          "base": 100
+        },
+        {
+          "name": "special-attack",
+          "base": 85
+        },
+        {
+          "name": "special-defense",
+          "base": 105
+        },
+        {
+          "name": "speed",
+          "base": 78
+        }
+      ],
+      "order": 4
+    },
+    {
+      "id": "816d2173-eddf-417a-837e-8f5ed41b6003",
+      "name": "wartortle",
+      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/8.png",
+      "stats": [
+        {
+          "name": "hp",
+          "base": 59
+        },
+        {
+          "name": "attack",
           "base": 63
         },
         {
-          "name": "special-attack",
-          "base": 80
-        },
-        {
-          "name": "special-defense",
-          "base": 80
-        },
-        {
-          "name": "speed",
-          "base": 60
-        }
-      ]
-    },
-    {
-      "id": "a08c",
-      "name": "mewtwo",
-      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png",
-      "stats": [
-        {
-          "name": "hp",
-          "base": 106
-        },
-        {
-          "name": "attack",
-          "base": 110
-        },
-        {
           "name": "defense",
-          "base": 90
-        },
-        {
-          "name": "special-attack",
-          "base": 154
-        },
-        {
-          "name": "special-defense",
-          "base": 90
-        },
-        {
-          "name": "speed",
-          "base": 130
-        }
-      ]
-    },
-    {
-      "id": "546d",
-      "name": "bulbasaur",
-      "image": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png",
-      "stats": [
-        {
-          "name": "hp",
-          "base": 45
-        },
-        {
-          "name": "attack",
-          "base": 49
-        },
-        {
-          "name": "defense",
-          "base": 49
+          "base": 80
         },
         {
           "name": "special-attack",
@@ -85,13 +183,14 @@
         },
         {
           "name": "special-defense",
-          "base": 65
+          "base": 80
         },
         {
           "name": "speed",
-          "base": 45
+          "base": 58
         }
-      ]
+      ],
+      "order": 5
     }
   ],
   "battles": [
@@ -320,6 +419,656 @@
       "result": "mewtwo, You Win!",
       "date": "2025-04-30T02:56:52.542Z",
       "battleType": "damage"
+    },
+    {
+      "id": "d1df",
+      "pokemon1": "ivysaur",
+      "pokemon2": "charmander",
+      "result": "Ivysaur, You Win!",
+      "date": "2026-04-30T22:04:01.916Z",
+      "battleType": "classic"
+    },
+    {
+      "id": "84c4",
+      "pokemon1": "charmander",
+      "pokemon2": "machoke",
+      "result": "Machoke, You Lose!",
+      "date": "2026-04-30T22:08:16.259Z",
+      "battleType": "classic"
+    },
+    {
+      "id": "1622",
+      "pokemon1": "mewtwo",
+      "pokemon2": "steenee",
+      "result": "Mewtwo, You Win!",
+      "date": "2026-04-30T22:10:45.684Z",
+      "battleType": "stats"
+    },
+    {
+      "id": "063b",
+      "pokemon1": "charmander",
+      "pokemon2": "pikachu-pop-star",
+      "result": "Pikachu Pop Star, You Lose!",
+      "date": "2026-04-30T22:14:35.579Z",
+      "battleType": "classic"
+    },
+    {
+      "id": "eeea",
+      "pokemon1": "bulbasaur",
+      "pokemon2": "ledian",
+      "result": "Ledian, You Lose!",
+      "date": "2026-04-30T22:14:49.319Z",
+      "battleType": "stats"
+    },
+    {
+      "id": "41012375-f2e3-4b85-b9b1-8be941f0e116",
+      "pokemon1": "bulbasaur",
+      "pokemon2": "squirtle",
+      "result": "Squirtle, You Lose!",
+      "date": "2026-05-01T13:12:07.423Z",
+      "battleType": "classic",
+      "difficulty": "normal",
+      "duration": 26,
+      "turns": 3,
+      "remainingHp": {
+        "player": 0,
+        "enemy": 47
+      },
+      "moveHistory": [
+        {
+          "turn": 1,
+          "user": "bulbasaur",
+          "target": "squirtle",
+          "move": "razor-wind",
+          "damage": 28,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 1
+        },
+        {
+          "turn": 2,
+          "user": "squirtle",
+          "target": "bulbasaur",
+          "move": "ice-punch",
+          "damage": 48,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 2
+        },
+        {
+          "turn": 3,
+          "user": "squirtle",
+          "target": "bulbasaur",
+          "move": "ice-punch",
+          "damage": 50
+        }
+      ],
+      "mvpPokemon": "squirtle"
+    },
+    {
+      "id": "6dcec0bd-7792-446f-ac91-21309a41ee0b",
+      "pokemon1": "scovillain-mega",
+      "pokemon2": "charizard",
+      "result": "It's a Draw!",
+      "date": "2026-05-01T13:12:42.631Z",
+      "battleType": "stats"
+    },
+    {
+      "id": "e33f7019-4be1-47f9-a581-4b6d663c7ebc",
+      "pokemon1": "bulbasaur",
+      "pokemon2": "beedrill",
+      "result": "Beedrill, You Lose!",
+      "date": "2026-05-01T13:13:42.804Z",
+      "battleType": "classic",
+      "difficulty": "normal",
+      "duration": 7,
+      "turns": 2,
+      "remainingHp": {
+        "player": 0,
+        "enemy": 112
+      },
+      "moveHistory": [
+        {
+          "turn": 1,
+          "user": "beedrill",
+          "target": "bulbasaur",
+          "move": "take-down",
+          "damage": 81,
+          "missed": false,
+          "critical": true,
+          "effectiveness": 1
+        },
+        {
+          "turn": 2,
+          "user": "beedrill",
+          "target": "bulbasaur",
+          "move": "take-down",
+          "damage": 88
+        }
+      ],
+      "mvpPokemon": "beedrill"
+    },
+    {
+      "id": "d97c5400-3010-4a73-ad21-929924dd5544",
+      "pokemon1": "charmander",
+      "pokemon2": "greninja-mega",
+      "result": "Greninja Mega, You Lose!",
+      "date": "2026-05-01T13:31:20.124Z",
+      "battleType": "classic",
+      "battleMode": "single",
+      "difficulty": "normal",
+      "duration": 0,
+      "turns": 1,
+      "remainingHp": {
+        "player": 0,
+        "enemy": 144
+      },
+      "moveHistory": [
+        {
+          "turn": 1,
+          "user": "greninja-mega",
+          "target": "charmander",
+          "move": "water-burst",
+          "damage": 157
+        }
+      ],
+      "mvpPokemon": "greninja-mega"
+    },
+    {
+      "id": "78db9058-10b4-4725-b8d2-293efa487048",
+      "pokemon1": "charmander",
+      "pokemon2": "clefairy",
+      "result": "Clefairy, You Lose!",
+      "date": "2026-05-01T13:34:07.547Z",
+      "battleType": "classic",
+      "battleMode": "team",
+      "difficulty": "normal",
+      "duration": 24,
+      "turns": 5,
+      "remainingHp": {
+        "player": 0,
+        "enemy": 17
+      },
+      "moveHistory": [
+        {
+          "turn": 1,
+          "user": "charmander",
+          "target": "clefairy",
+          "move": "fire-punch",
+          "damage": 42,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 1
+        },
+        {
+          "turn": 2,
+          "user": "clefairy",
+          "target": "charmander",
+          "move": "mega-punch",
+          "damage": 29,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 1
+        },
+        {
+          "turn": 3,
+          "user": "charmander",
+          "target": "clefairy",
+          "move": "thunder-punch",
+          "damage": 39,
+          "missed": false,
+          "critical": true,
+          "effectiveness": 1
+        },
+        {
+          "turn": 4,
+          "user": "clefairy",
+          "target": "charmander",
+          "move": "mega-punch",
+          "damage": 30,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 1
+        },
+        {
+          "turn": 5,
+          "user": "clefairy",
+          "target": "charmander",
+          "move": "mega-punch",
+          "damage": 28
+        }
+      ],
+      "mvpPokemon": "clefairy"
+    },
+    {
+      "id": "697bc9cc-2303-4014-8598-066d7c3367d3",
+      "pokemon1": "wartortle",
+      "pokemon2": "koraidon",
+      "result": "Koraidon, You Lose!",
+      "date": "2026-05-01T13:40:34.153Z",
+      "battleType": "classic",
+      "battleMode": "team",
+      "difficulty": "normal",
+      "duration": 46,
+      "turns": 22,
+      "remainingHp": {
+        "player": 0,
+        "enemy": 31
+      },
+      "moveHistory": [
+        {
+          "turn": 1,
+          "user": "magby",
+          "target": "charmander",
+          "move": "thunder-punch",
+          "damage": 46,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 1
+        },
+        {
+          "turn": 2,
+          "user": "charmander",
+          "target": "koraidon",
+          "move": "thunder-punch",
+          "damage": 5,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 0.5
+        },
+        {
+          "turn": 3,
+          "user": "koraidon",
+          "target": "charmander",
+          "move": "double-edge",
+          "damage": 124,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 1
+        },
+        {
+          "turn": 4,
+          "user": "koraidon",
+          "target": "charmander",
+          "move": "double-edge",
+          "damage": 186,
+          "missed": false,
+          "critical": true,
+          "effectiveness": 1
+        },
+        {
+          "turn": 5,
+          "user": "koraidon",
+          "target": "charmander",
+          "move": "double-edge",
+          "damage": 125,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 1
+        },
+        {
+          "turn": 6,
+          "user": "venusaur",
+          "target": "koraidon",
+          "move": "headbutt",
+          "damage": 15,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 1
+        },
+        {
+          "turn": 7,
+          "user": "koraidon",
+          "target": "venusaur",
+          "move": "flamethrower",
+          "damage": 50,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 2
+        },
+        {
+          "turn": 8,
+          "user": "koraidon",
+          "target": "venusaur",
+          "move": "flamethrower",
+          "damage": 51,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 2
+        },
+        {
+          "turn": 9,
+          "user": "charizard",
+          "target": "koraidon",
+          "move": "mega-punch",
+          "damage": 19,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 1
+        },
+        {
+          "turn": 10,
+          "user": "koraidon",
+          "target": "charizard",
+          "move": "double-edge",
+          "damage": 71,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 1
+        },
+        {
+          "turn": 11,
+          "user": "charizard",
+          "target": "koraidon",
+          "move": "thunder-punch",
+          "damage": 8,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 0.5
+        },
+        {
+          "turn": 12,
+          "user": "koraidon",
+          "target": "charizard",
+          "move": "double-edge",
+          "damage": 64,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 1
+        },
+        {
+          "turn": 13,
+          "user": "koraidon",
+          "target": "charizard",
+          "move": "double-edge",
+          "damage": 104,
+          "missed": false,
+          "critical": true,
+          "effectiveness": 1
+        },
+        {
+          "turn": 14,
+          "user": "butterfree",
+          "target": "koraidon",
+          "move": "tackle",
+          "damage": 5,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 1
+        },
+        {
+          "turn": 15,
+          "user": "koraidon",
+          "target": "butterfree",
+          "move": "flamethrower",
+          "damage": 61,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 2
+        },
+        {
+          "turn": 16,
+          "user": "koraidon",
+          "target": "butterfree",
+          "move": "flamethrower",
+          "damage": 64,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 2
+        },
+        {
+          "turn": 17,
+          "user": "blastoise",
+          "target": "koraidon",
+          "move": "ice-punch",
+          "damage": 55,
+          "missed": false,
+          "critical": true,
+          "effectiveness": 2
+        },
+        {
+          "turn": 18,
+          "user": "koraidon",
+          "target": "blastoise",
+          "move": "double-edge",
+          "damage": 55,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 1
+        },
+        {
+          "turn": 19,
+          "user": "blastoise",
+          "target": "koraidon",
+          "move": "ice-punch",
+          "damage": 36,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 2
+        },
+        {
+          "turn": 20,
+          "user": "koraidon",
+          "target": "blastoise",
+          "move": "double-edge",
+          "damage": 51,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 1
+        },
+        {
+          "turn": 21,
+          "user": "koraidon",
+          "target": "blastoise",
+          "move": "double-edge",
+          "damage": 58,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 1
+        },
+        {
+          "turn": 22,
+          "user": "koraidon",
+          "target": "wartortle",
+          "move": "double-edge",
+          "damage": 64
+        }
+      ],
+      "mvpPokemon": "koraidon"
+    },
+    {
+      "id": "cbdfc1d1-e804-4cc7-98ef-20b163d2dc9c",
+      "pokemon1": "charmander",
+      "pokemon2": "milotic",
+      "result": "Milotic, You Lose!",
+      "date": "2026-05-01T13:41:24.510Z",
+      "battleType": "classic",
+      "battleMode": "single",
+      "difficulty": "normal",
+      "duration": 9,
+      "turns": 2,
+      "remainingHp": {
+        "player": 0,
+        "enemy": 172
+      },
+      "moveHistory": [
+        {
+          "turn": 1,
+          "user": "milotic",
+          "target": "charmander",
+          "move": "body-slam",
+          "damage": 37,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 1
+        },
+        {
+          "turn": 2,
+          "user": "milotic",
+          "target": "charmander",
+          "move": "body-slam",
+          "damage": 42
+        }
+      ],
+      "mvpPokemon": "milotic"
+    },
+    {
+      "id": "2ec51ef3-28a7-40c1-9c94-fcb5357d7e41",
+      "pokemon1": "venusaur",
+      "pokemon2": "pikachu",
+      "result": "Venusaur, You Win!",
+      "date": "2026-05-01T13:44:27.023Z",
+      "battleType": "stats"
+    },
+    {
+      "id": "b300d715-a50a-46fe-9c15-d0a91d6b1528",
+      "pokemon1": "butterfree",
+      "pokemon2": "mimikyu-totem-busted",
+      "result": "Mimikyu Totem Busted, You Lose!",
+      "date": "2026-05-01T13:46:07.571Z",
+      "battleType": "classic",
+      "battleMode": "single",
+      "difficulty": "normal",
+      "duration": 25,
+      "turns": 6,
+      "remainingHp": {
+        "player": 0,
+        "enemy": 107
+      },
+      "moveHistory": [
+        {
+          "turn": 1,
+          "user": "mimikyu-totem-busted",
+          "target": "butterfree",
+          "move": "thunderbolt",
+          "damage": 37,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 2
+        },
+        {
+          "turn": 2,
+          "user": "butterfree",
+          "target": "mimikyu-totem-busted",
+          "move": "razor-wind",
+          "damage": 1,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 0
+        },
+        {
+          "turn": 3,
+          "user": "mimikyu-totem-busted",
+          "target": "butterfree",
+          "move": "thunderbolt",
+          "damage": 37,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 2
+        },
+        {
+          "turn": 4,
+          "user": "butterfree",
+          "target": "mimikyu-totem-busted",
+          "move": "tackle",
+          "damage": 1,
+          "missed": false,
+          "critical": true,
+          "effectiveness": 0
+        },
+        {
+          "turn": 5,
+          "user": "mimikyu-totem-busted",
+          "target": "butterfree",
+          "move": "thunderbolt",
+          "damage": 36,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 2
+        },
+        {
+          "turn": 6,
+          "user": "mimikyu-totem-busted",
+          "target": "butterfree",
+          "move": "thunderbolt",
+          "damage": 35
+        }
+      ],
+      "mvpPokemon": "mimikyu-totem-busted"
+    },
+    {
+      "id": "b69ecd89-212f-4481-a9c1-524b51de55d8",
+      "pokemon1": "butterfree",
+      "pokemon2": "mimikyu-totem-busted",
+      "result": "Mimikyu Totem Busted, You Lose!",
+      "date": "2026-05-01T13:46:15.334Z",
+      "battleType": "stats"
+    },
+    {
+      "id": "1166783b-270d-42ea-adb6-2ecd7776aada",
+      "pokemon1": "charmander",
+      "pokemon2": "steenee",
+      "result": "Charmander, You Win!",
+      "date": "2026-05-01T13:48:05.605Z",
+      "battleType": "classic",
+      "battleMode": "single",
+      "difficulty": "normal",
+      "duration": 22,
+      "turns": 5,
+      "remainingHp": {
+        "player": 24,
+        "enemy": 0
+      },
+      "moveHistory": [
+        {
+          "turn": 1,
+          "user": "charmander",
+          "target": "steenee",
+          "move": "fire-punch",
+          "damage": 76,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 2
+        },
+        {
+          "turn": 2,
+          "user": "steenee",
+          "target": "charmander",
+          "move": "take-down",
+          "damage": 27,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 1
+        },
+        {
+          "turn": 3,
+          "user": "charmander",
+          "target": "steenee",
+          "move": "thunder-punch",
+          "damage": 14,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 0.5
+        },
+        {
+          "turn": 4,
+          "user": "steenee",
+          "target": "charmander",
+          "move": "take-down",
+          "damage": 27,
+          "missed": false,
+          "critical": false,
+          "effectiveness": 1
+        },
+        {
+          "turn": 5,
+          "user": "charmander",
+          "target": "steenee",
+          "move": "scratch",
+          "damage": 15
+        }
+      ],
+      "mvpPokemon": "charmander"
     }
   ]
 }

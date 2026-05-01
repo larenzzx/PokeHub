@@ -1,12 +1,85 @@
-# React + Vite
+# PokeHub
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React, TailwindCSS, and DaisyUI Pokémon app with a fast Pokédex, team builder, battle history, and classic turn-based battle simulation.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Paginated full Pokédex using PokeAPI `limit` and `offset`
+- Cached Pokémon detail, type, and weakness requests to reduce repeated API calls
+- Responsive Pokémon cards with lazy-loaded detail modal data
+- Team builder backed by the local JSON server
+- Battle history backed by the local JSON server
+- Stats-based battle mode
+- Classic battle mode with HP, moves, turn order, damage calculation, battle messages, reset state, and sprite animations
+- Battle intro transition with optional sound controls
+- Optional audio support with fallback generated tones if files are missing
 
-## Expanding the ESLint configuration
+## Project Structure
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- `src/api` - PokeAPI and local JSON server helpers
+- `src/components` - shared UI components
+- `src/hooks` - reusable React hooks, including battle audio
+- `src/pages` - route-level pages
+- `src/utils` - type styling, formatting, and battle logic
+- `public/audio` - optional audio files
+
+## Installation
+
+```bash
+npm install
+```
+
+## Development
+
+Run the React app:
+
+```bash
+npm run dev
+```
+
+Run the local JSON server in a separate terminal for team and battle history persistence:
+
+```bash
+npm run server
+```
+
+The app still loads if the local JSON server is not running, but team and battle history writes will not persist.
+
+## Build
+
+```bash
+npm run build
+```
+
+Preview a production build:
+
+```bash
+npm run preview
+```
+
+## Audio Files
+
+Audio is optional and browser-safe. Music starts only after user interaction through battle start or sound controls.
+
+Place lightweight files here if desired:
+
+- `public/audio/main-theme.mp3`
+- `public/audio/battle-theme.mp3`
+- `public/audio/battle-start.mp3`
+- `public/audio/attack.mp3`
+- `public/audio/win.mp3`
+- `public/audio/lose.mp3`
+- `public/audio/click.mp3`
+
+If a file is missing or blocked, the app falls back gracefully.
+
+## Vercel Deployment
+
+1. Push the project to GitHub.
+2. Import the repository in Vercel.
+3. Use the default Vite settings:
+   - Build command: `npm run build`
+   - Output directory: `dist`
+4. Deploy.
+
+No environment variables are required for the public PokeAPI integration. The local JSON server is for development only; for production persistence, replace it with a hosted API or database.
