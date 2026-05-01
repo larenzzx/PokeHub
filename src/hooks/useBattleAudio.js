@@ -11,9 +11,10 @@ const AUDIO_FILES = {
 };
 
 export function useBattleAudio() {
-  const [enabled, setEnabled] = useState(false);
-  const [muted, setMuted] = useState(true);
-  const [volume, setVolume] = useState(0.45);
+  const savedSettings = readSavedSettings();
+  const [enabled, setEnabled] = useState(Boolean(savedSettings.soundEnabled));
+  const [muted, setMuted] = useState(savedSettings.soundEnabled === false);
+  const [volume, setVolume] = useState(Number(savedSettings.volume ?? 0.45));
   const tracks = useRef({});
   const audioContext = useRef(null);
 
@@ -116,3 +117,10 @@ export function useBattleAudio() {
   };
 }
 
+function readSavedSettings() {
+  try {
+    return JSON.parse(localStorage.getItem("pokehub:settings")) || {};
+  } catch {
+    return {};
+  }
+}

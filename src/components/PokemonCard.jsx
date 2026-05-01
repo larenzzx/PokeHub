@@ -4,8 +4,9 @@ import { addTeamMember, fetchTeam } from "../api/localApi";
 import { fetchPokemon, fetchWeaknesses, getPokemonSprite } from "../api/pokeApi";
 import { formatPokemonName, typeColors, typeSoftColors } from "../utils/pokemonTypes";
 import { TypeBadge } from "./TypeBadge";
+import { StatBar } from "./ui";
 
-export function PokemonCard({ pokemon: initialPokemon, identifier, onTeamChange }) {
+export function PokemonCard({ pokemon: initialPokemon, identifier, onTeamChange, compact = false, compareSelected = false, onCompare }) {
   const [pokemon, setPokemon] = useState(initialPokemon || null);
   const [weaknesses, setWeaknesses] = useState([]);
   const [weaknessLoading, setWeaknessLoading] = useState(false);
@@ -23,7 +24,7 @@ export function PokemonCard({ pokemon: initialPokemon, identifier, onTeamChange 
       .then((data) => {
         if (!cancelled) setPokemon(data);
       })
-      .catch((error) => console.error("Error loading Pokemon card:", error));
+      .catch((error) => console.error("Error loading Pokémon card:", error));
 
     return () => {
       cancelled = true;
@@ -74,7 +75,7 @@ export function PokemonCard({ pokemon: initialPokemon, identifier, onTeamChange 
         return;
       }
       if (team.length >= 6) {
-        setToast({ type: "error", message: "Your team is full. Remove a Pokemon first." });
+        setToast({ type: "error", message: "Your team is full. Remove a Pokémon first." });
         return;
       }
 
@@ -89,8 +90,8 @@ export function PokemonCard({ pokemon: initialPokemon, identifier, onTeamChange 
       setToast({ type: "success", message: `${formatPokemonName(pokemon.name)} joined your team.` });
       onTeamChange?.();
     } catch (error) {
-      console.error("Error adding Pokemon to team:", error);
-      setToast({ type: "error", message: "Could not add Pokemon. Start the local server and try again." });
+      console.error("Error adding Pokémon to team:", error);
+      setToast({ type: "error", message: "Could not add Pokémon. It will save locally if the server is offline." });
     }
   };
 
@@ -99,9 +100,9 @@ export function PokemonCard({ pokemon: initialPokemon, identifier, onTeamChange 
       <button
         type="button"
         onClick={openDetails}
-        className="card group w-full overflow-hidden rounded-lg border-4 border-slate-900 bg-white text-left shadow-[0_4px_0_#94a3b8] transition duration-200 hover:-translate-y-1 hover:shadow-[0_8px_0_#64748b]"
+        className={`card group w-full cursor-pointer overflow-hidden rounded-lg border-4 border-slate-900 bg-white text-left shadow-[0_4px_0_#94a3b8] transition duration-200 hover:-translate-y-1 hover:shadow-[0_8px_0_#64748b] ${compact ? "sm:grid sm:grid-cols-[190px_1fr]" : ""}`}
       >
-        <figure className={`relative h-40 border-b-4 border-slate-900 ${typeSoftColors[primaryType] || "bg-base-200"}`}>
+        <figure className={`relative ${compact ? "h-full min-h-36 border-b-4 sm:border-b-0 sm:border-r-4" : "h-40 border-b-4"} border-slate-900 ${typeSoftColors[primaryType] || "bg-base-200"}`}>
           <div className={`absolute inset-x-0 top-0 h-2 ${typeColors[primaryType] || "bg-gray-400"}`} />
           <span className="absolute left-3 top-4 rounded-md border-2 border-slate-900 bg-white px-2 py-1 text-xs font-black text-blue-950">
             #{String(pokemon.id).padStart(3, "0")}
@@ -125,7 +126,7 @@ export function PokemonCard({ pokemon: initialPokemon, identifier, onTeamChange 
           </div>
           <div className="flex flex-wrap gap-2">
             {pokemon.types.map((type) => (
-              <TypeBadge key={type.type.name} type={type} />
+              <TypeBadge key={type.type?.name || type.name || type} type={type} />
             ))}
           </div>
           <div className="grid grid-cols-3 gap-2 text-center text-xs font-black text-slate-700">
@@ -139,14 +140,33 @@ export function PokemonCard({ pokemon: initialPokemon, identifier, onTeamChange 
               );
             })}
           </div>
+          {onCompare && (
+            <span
+              role="button"
+              tabIndex={0}
+              onClick={(event) => {
+                event.stopPropagation();
+                onCompare();
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.stopPropagation();
+                  onCompare();
+                }
+              }}
+              className={`btn btn-sm ${compareSelected ? "btn-primary" : "btn-outline"} w-full`}
+            >
+              {compareSelected ? "Selected for compare" : "Compare"}
+            </span>
+          )}
         </div>
       </button>
 
       <dialog id={modalId} className="modal">
-        <div className="modal-box max-w-4xl overflow-hidden rounded-lg border-4 border-slate-900 bg-white p-0 text-slate-950">
+        <div className="modal-box max-h-[90dvh] w-[94vw] max-w-4xl overflow-y-auto overscroll-contain rounded-lg border-4 border-slate-900 bg-white p-0 text-slate-950">
           <div className={`${typeSoftColors[primaryType] || "bg-base-200"} relative border-b-4 border-slate-900`}>
             <form method="dialog">
-              <button className="btn btn-circle btn-ghost btn-sm absolute right-4 top-4 bg-white/60" aria-label="Close">
+              <button className="btn btn-circle btn-ghost btn-sm absolute right-4 top-4 z-20 bg-white/70 shadow" aria-label="Close">
                 <X className="size-4" />
               </button>
             </form>
@@ -154,10 +174,10 @@ export function PokemonCard({ pokemon: initialPokemon, identifier, onTeamChange 
               <img src={sprite} alt={pokemon.name} className="h-56 w-full object-contain drop-shadow-xl" />
               <div className="self-center">
                 <p className="text-sm font-black text-blue-900">#{String(pokemon.id).padStart(3, "0")}</p>
-                <h3 className="text-4xl font-black leading-tight">{formatPokemonName(pokemon.name)}</h3>
+                <h3 className="break-words text-3xl font-black leading-tight sm:text-4xl">{formatPokemonName(pokemon.name)}</h3>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {pokemon.types.map((type) => (
-                    <TypeBadge key={type.type.name} type={type} size="lg" />
+                    <TypeBadge key={type.type?.name || type.name || type} type={type} size="lg" />
                   ))}
                 </div>
                 <div className="mt-4 grid max-w-md grid-cols-2 gap-3 text-sm font-semibold">
@@ -172,13 +192,7 @@ export function PokemonCard({ pokemon: initialPokemon, identifier, onTeamChange 
             <section className="rounded-lg border-2 border-slate-900 bg-slate-50 p-4">
               <h4 className="mb-3 text-lg font-bold">Base Stats</h4>
               <div className="space-y-3">
-                {pokemon.stats.map((stat) => (
-                  <div key={stat.stat.name} className="grid grid-cols-[96px_1fr_36px] items-center gap-3 text-sm">
-                    <span className="font-bold capitalize text-slate-700">{stat.stat.name}</span>
-                    <progress className="progress progress-primary h-3" value={stat.base_stat} max="180" />
-                    <span className="text-right font-bold">{stat.base_stat}</span>
-                  </div>
-                ))}
+                {pokemon.stats.map((stat) => <StatBar key={stat.stat.name} label={stat.stat.name} value={stat.base_stat} />)}
               </div>
             </section>
             <section className="rounded-lg border-2 border-slate-900 bg-slate-50 p-4">
@@ -200,7 +214,7 @@ export function PokemonCard({ pokemon: initialPokemon, identifier, onTeamChange 
                 <div className="flex flex-wrap gap-2">
                   {pokemon.moves.slice(0, 4).map((move) => (
                     <span key={move.move.name} className="badge badge-outline capitalize">
-                      {move.move.name.replaceAll("-", " ")}
+                      {(move.move?.name || move.name).replaceAll("-", " ")}
                     </span>
                   ))}
                 </div>
@@ -216,12 +230,15 @@ export function PokemonCard({ pokemon: initialPokemon, identifier, onTeamChange 
             </section>
           </div>
         </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
       </dialog>
 
       <dialog id={confirmId} className="modal">
-        <div className="modal-box rounded-lg">
+        <div className="modal-box max-h-[92dvh] overflow-y-auto rounded-lg">
           <h3 className="text-xl font-bold">Add to team?</h3>
-          <p className="py-3">Add {formatPokemonName(pokemon.name)} to your six Pokemon team.</p>
+          <p className="py-3">Add {formatPokemonName(pokemon.name)} to your six Pokémon team.</p>
           <div className="modal-action">
             <form method="dialog" className="flex w-full gap-2">
               <button className="btn btn-outline flex-1">Cancel</button>
@@ -231,6 +248,9 @@ export function PokemonCard({ pokemon: initialPokemon, identifier, onTeamChange 
             </form>
           </div>
         </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
       </dialog>
 
       {toast && (

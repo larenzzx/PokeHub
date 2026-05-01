@@ -1,12 +1,12 @@
 # PokeHub
 
-A React, TailwindCSS, and DaisyUI Pokemon app with a fast Pokedex, team builder, battle history, and classic turn-based battle simulation.
+A React, TailwindCSS, and DaisyUI Pokémon app with a fast Pokédex, team builder, battle history, and classic turn-based battle simulation.
 
 ## Features
 
-- Paginated full Pokedex using PokeAPI `limit` and `offset`
-- Cached Pokemon detail, type, and weakness requests to reduce repeated API calls
-- Responsive Pokemon cards with lazy-loaded detail modal data
+- Paginated full Pokédex using PokeAPI `limit` and `offset`
+- Cached Pokémon detail, type, and weakness requests to reduce repeated API calls
+- Responsive Pokémon cards with lazy-loaded detail modal data
 - Team builder backed by the local JSON server
 - Battle history backed by the local JSON server
 - Stats-based battle mode

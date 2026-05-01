@@ -1,3 +1,5 @@
+import { formatMoveLabel, normalizeBattleMove, normalizeTypeName, normalizeTypeNames } from "./pokemonData.js";
+
 export const typeEffectiveness = {
   normal: { rock: 0.5, ghost: 0, steel: 0.5 },
   fire: { fire: 0.5, water: 0.5, grass: 2, ice: 2, bug: 2, rock: 0.5, dragon: 0.5, steel: 2 },
@@ -25,21 +27,26 @@ export const getStat = (pokemon, statName) =>
 export const getMaxHp = (pokemon) => Math.max(25, getStat(pokemon, "hp") * 2);
 
 export function getBattleMoves(pokemon) {
-  const primaryType = pokemon?.types?.[0]?.type?.name || "normal";
+  const primaryType = pokemon?.typeNames?.[0] || normalizeTypeNames(pokemon?.types)[0] || "normal";
+  if (pokemon?.battleMoves?.length) {
+    return pokemon.battleMoves.map((move) => normalizeBattleMove(move, primaryType)).filter((move) => move.power > 0);
+  }
   const statAttack = getStat(pokemon, "attack");
   const statSpecial = getStat(pokemon, "special-attack");
   const sourceMoves = pokemon?.moves?.slice(0, 24) || [];
   const picked = [];
 
   for (const entry of sourceMoves) {
-    const name = entry.move.name;
+    const name = entry.move?.name || entry.name;
     if (picked.some((move) => move.name === name)) continue;
     picked.push({
       name,
-      label: name.split("-").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" "),
+      label: formatMoveLabel(name),
       type: picked.length % 2 === 0 ? primaryType : "normal",
       power: Math.max(35, Math.min(95, Math.round((statAttack + statSpecial) / 2) + picked.length * 6)),
       accuracy: Math.max(82, 96 - picked.length * 3),
+      category: picked.length % 2 === 0 ? "special" : "physical",
+      pp: 15,
     });
     if (picked.length === 4) break;
   }
@@ -53,20 +60,22 @@ export function getBattleMoves(pokemon) {
 }
 
 export function calculateTypeEffectiveness(attackingType, defendingTypes) {
-  return defendingTypes.reduce((total, type) => {
-    const defType = type.type?.name || type.name || type;
-    return total * (typeEffectiveness[attackingType]?.[defType] ?? 1);
+  const attackType = normalizeTypeName(attackingType);
+  return normalizeTypeNames(defendingTypes).reduce((total, defType) => {
+    return total * (typeEffectiveness[attackType]?.[defType] ?? 1);
   }, 1);
 }
 
 export function calculateMoveDamage(attacker, defender, move) {
-  const attack = Math.max(getStat(attacker, "attack"), getStat(attacker, "special-attack"));
-  const defense = Math.max(1, Math.max(getStat(defender, "defense"), getStat(defender, "special-defense")));
-  const sameTypeBonus = attacker.types.some((type) => type.type.name === move.type) ? 1.2 : 1;
-  const effectiveness = calculateTypeEffectiveness(move.type, defender.types);
+  const battleMove = normalizeBattleMove(move, normalizeTypeNames(attacker?.types)[0]);
+  const isSpecial = battleMove.category === "special";
+  const attack = getStat(attacker, isSpecial ? "special-attack" : "attack");
+  const defense = Math.max(1, getStat(defender, isSpecial ? "special-defense" : "defense"));
+  const sameTypeBonus = normalizeTypeNames(attacker.types).includes(battleMove.type) ? 1.5 : 1;
+  const effectiveness = calculateTypeEffectiveness(battleMove.type, defender.types);
   const randomFactor = 0.88 + Math.random() * 0.16;
   const critical = Math.random() < 0.08 ? 1.5 : 1;
-  const missed = Math.random() * 100 > move.accuracy;
+  const missed = Math.random() * 100 > battleMove.accuracy;
 
   if (missed) {
     return { damage: 0, effectiveness, critical: false, missed: true };
@@ -74,9 +83,8 @@ export function calculateMoveDamage(attacker, defender, move) {
 
   const damage = Math.max(
     1,
-    Math.floor(((move.power * attack) / defense) * 0.35 * sameTypeBonus * effectiveness * randomFactor * critical)
+    Math.floor(((battleMove.power * attack) / defense) * 0.35 * sameTypeBonus * effectiveness * randomFactor * critical)
   );
 
   return { damage, effectiveness, critical: critical > 1, missed: false };
 }
-

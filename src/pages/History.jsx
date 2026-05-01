@@ -2,16 +2,19 @@ import { Navbar } from "../components/Navbar";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { deleteBattle, fetchBattles } from "../api/localApi";
+import { Link } from "react-router-dom";
+import { RotateCcw, Trash2 } from "lucide-react";
 
 export const History = () => {
   const [battles, setBattles] = useState([]);
   const [selectedBattle, setSelectedBattle] = useState(null); // For delete modal
   const [filterType, setFilterType] = useState("all"); // Filter options: all, wins, losses, draws
+  const [toast, setToast] = useState("");
 
   const fetchBattleHistory = async () => {
     try {
       const response = await fetchBattles();
-      const sortedBattles = response.sort(
+      const sortedBattles = [...response].sort(
         (a, b) => new Date(b.date) - new Date(a.date)
       );
       setBattles(sortedBattles);
@@ -25,18 +28,22 @@ export const History = () => {
       await deleteBattle(id);
       setBattles((prev) => prev.filter((b) => b.id !== id));
       setSelectedBattle(null);
-      // Show toast
-      const toast = document.getElementById("toast-delete");
-      if (toast) toast.classList.remove("hidden");
-      setTimeout(() => toast?.classList.add("hidden"), 3000);
+      setToast("Battle record deleted.");
     } catch (error) {
       console.error("Error deleting battle:", error);
+      setToast("Could not delete battle. It was removed locally if the server is offline.");
     }
   };
 
   useEffect(() => {
     fetchBattleHistory();
   }, []);
+
+  useEffect(() => {
+    if (!toast) return undefined;
+    const timer = window.setTimeout(() => setToast(""), 2800);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
 
   const totalWins = battles.filter((b) => b.result.includes("You Win!")).length;
   const totalLosses = battles.filter((b) =>
@@ -102,6 +109,11 @@ export const History = () => {
           <p className="text-sm font-black uppercase text-blue-800">Trainer records</p>
           <h2 className="pokemon-title text-4xl text-yellow-300 sm:text-5xl">Battle History</h2>
         </section>
+        {toast && (
+          <div className="toast toast-top toast-end z-50">
+            <div className="alert alert-success shadow-lg"><span>{toast}</span></div>
+          </div>
+        )}
 
         {/* Stats Summary Card */}
         <div className="stats mb-8 w-full overflow-hidden border-4 border-slate-900 bg-white text-slate-950 shadow-[0_4px_0_#94a3b8]">
@@ -167,26 +179,17 @@ export const History = () => {
           >
             Draws
           </button>
+          <button className="btn btn-outline" onClick={() => setFilterType("all")}>
+            <RotateCcw className="size-4" />
+            Clear filters
+          </button>
         </div>
 
         {battles.length === 0 ? (
-          <div className="alert alert-info">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              className="stroke-current shrink-0 w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              ></path>
-            </svg>
-            <span>
-              No battles recorded yet. Start battling to see your history!
-            </span>
+          <div className="game-panel mx-auto max-w-lg p-8 text-center">
+            <h2 className="text-2xl font-black text-blue-950">No battles recorded yet</h2>
+            <p className="mt-2 font-semibold text-slate-700">Start a classic battle to build your trainer record.</p>
+            <Link to="/battle" className="btn btn-primary mt-5">Start battle</Link>
           </div>
         ) : filteredBattles.length === 0 ? (
           <div className="alert alert-info">
@@ -230,6 +233,7 @@ export const History = () => {
                       <div className="text-sm font-semibold text-slate-600">
                         {dayjs(battle.date).format("MMM D, YYYY h:mm A")}
                       </div>
+                      {battle.turns && <div className="text-xs font-bold text-slate-500">{battle.turns} turns · {battle.duration || 0}s · MVP {battle.mvpPokemon}</div>}
                     </div>
 
                     <div className="flex justify-end">
@@ -237,6 +241,7 @@ export const History = () => {
                         className="btn btn-sm btn-error"
                         onClick={() => setSelectedBattle(battle)}
                       >
+                        <Trash2 className="size-4" />
                         Delete
                       </button>
                     </div>
@@ -273,12 +278,6 @@ export const History = () => {
         </dialog>
       )}
 
-      {/* DaisyUI Toast */}
-      <div id="toast-delete" className="toast toast-top toast-end hidden z-50">
-        <div className="alert alert-success">
-          <span>Battle record deleted successfully.</span>
-        </div>
-      </div>
     </div>
   );
 };

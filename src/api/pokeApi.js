@@ -1,14 +1,16 @@
 import axios from "axios";
 import { getPokemonIdFromUrl } from "../utils/pokemonTypes";
+import { normalizeBattleMove, normalizePokemon, normalizeTypeNames } from "../utils/pokemonData";
 
 const api = axios.create({
-  baseURL: "https://pokeapi.co/api/v2",
+  baseURL: import.meta.env.VITE_POKEAPI_URL || "https://pokeapi.co/api/v2",
   timeout: 12000,
 });
 
 const pokemonCache = new Map();
 const listCache = new Map();
 const typeCache = new Map();
+const moveCache = new Map();
 let typesPromise;
 let summariesPromise;
 
@@ -21,18 +23,39 @@ export const getPokemonSprite = (pokemon) =>
   pokemon?.sprites?.front_default ||
   "";
 
-export const simplifyPokemon = (pokemon) => ({
-  id: pokemon.id,
-  name: pokemon.name,
-  height: pokemon.height,
-  weight: pokemon.weight,
-  stats: pokemon.stats,
-  moves: pokemon.moves,
-  sprites: pokemon.sprites,
-  types: pokemon.types,
-  abilities: pokemon.abilities,
-  sprite: getPokemonSprite(pokemon),
-});
+export const getBattleSprite = (pokemon, side = "front") => {
+  const sprites = pokemon?.sprites || {};
+  if (side === "back") {
+    return (
+      sprites.back_default ||
+      sprites.versions?.["generation-v"]?.["black-white"]?.animated?.back_default ||
+      sprites.versions?.["generation-v"]?.["black-white"]?.back_default ||
+      getPokemonSprite(pokemon)
+    );
+  }
+
+  return (
+    sprites.front_default ||
+    sprites.versions?.["generation-v"]?.["black-white"]?.animated?.front_default ||
+    sprites.versions?.["generation-v"]?.["black-white"]?.front_default ||
+    getPokemonSprite(pokemon)
+  );
+};
+
+export const simplifyPokemon = (pokemon) =>
+  normalizePokemon({
+    id: pokemon.id,
+    name: pokemon.name,
+    height: pokemon.height,
+    weight: pokemon.weight,
+    stats: pokemon.stats,
+    moves: pokemon.moves,
+    sprites: pokemon.sprites,
+    types: pokemon.types,
+    typeNames: normalizeTypeNames(pokemon.types),
+    abilities: pokemon.abilities,
+    sprite: getPokemonSprite(pokemon),
+  });
 
 export async function fetchPokemon(identifier) {
   const key = String(identifier).toLowerCase();
@@ -98,6 +121,52 @@ export async function fetchPokemonTypes() {
   return typesPromise;
 }
 
+export async function fetchMove(identifier) {
+  const key = String(identifier).toLowerCase();
+  if (moveCache.has(key)) return moveCache.get(key);
+
+  const promise = api
+    .get(`/move/${key}`)
+    .then((response) => response.data)
+    .catch((error) => {
+      moveCache.delete(key);
+      throw error;
+    });
+
+  moveCache.set(key, promise);
+  return promise;
+}
+
+export async function hydratePokemonBattleMoves(pokemon) {
+  if (!pokemon || pokemon.battleMoves?.length >= 4) return normalizePokemon(pokemon);
+
+  const primaryType = pokemon.typeNames?.[0] || normalizeTypeNames(pokemon.types)[0] || "normal";
+  const candidates = (pokemon.moves || []).slice(0, 30);
+  const details = await Promise.allSettled(
+    candidates.map((entry) => fetchMove(entry.move?.name || entry.name))
+  );
+
+  const damagingMoves = details
+    .filter((result) => result.status === "fulfilled")
+    .map((result) => normalizeBattleMove(result.value, primaryType))
+    .filter((move) => move.power > 0 && move.category !== "status");
+
+  const selected = [];
+  for (const move of damagingMoves) {
+    if (!selected.some((selectedMove) => selectedMove.name === move.name)) {
+      selected.push(move);
+    }
+    if (selected.length === 4) break;
+  }
+
+  const fallback = [
+    normalizeBattleMove({ name: "tackle", type: "normal", power: 40, accuracy: 100, category: "physical", pp: 35 }),
+    normalizeBattleMove({ name: `${primaryType}-burst`, type: primaryType, power: 55, accuracy: 95, category: "special", pp: 15 }),
+  ];
+
+  return normalizePokemon({ ...pokemon, battleMoves: selected.length ? selected : fallback });
+}
+
 export async function fetchPokemonSummaries() {
   if (!summariesPromise) {
     summariesPromise = api.get("/pokemon?limit=1&offset=0").then((countResponse) =>
@@ -137,7 +206,7 @@ export async function fetchPokemonByType(typeName) {
 }
 
 export async function fetchWeaknesses(types) {
-  const typeNames = types.map((type) => type.type?.name || type.name);
+  const typeNames = normalizeTypeNames(types);
   const responses = await Promise.all(
     typeNames.map((type) => api.get(`/type/${type}`))
   );
